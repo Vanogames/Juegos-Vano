@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>juegos Vano</title>
+<meta name="description" content="juegos Vano: juegos de historias hechos en Python para niños de 5 a 8 años.">
+<meta property="og:site_name" content="juegos Vano">
+<meta property="og:title" content="juegos Vano">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+2:wght@500;800&family=Bangers&display=swap">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;line-height:1.45}
+.wrap{max-width:1040px;margin:0 auto;padding:0 18px 60px}
+header{text-align:center;padding:48px 0 18px}
+h1{margin:6px 0 10px;font-size:clamp(38px,9vw,76px);line-height:1}
+header p{margin:0 auto;max-width:520px;font-size:clamp(18px,3.6vw,24px)}
+.fl{display:flex;justify-content:center;gap:14px;font-size:40px}
+.fl span{animation:up 2.4s ease-in-out infinite}
+.fl span:nth-child(2){animation-delay:.4s}.fl span:nth-child(3){animation-delay:.8s}
+@keyframes up{50%{transform:translateY(-12px) rotate(8deg)}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:24px;margin-top:26px}
+.card{display:flex;flex-direction:column;transition:transform .2s}
+.thumb{display:flex;align-items:center;justify-content:center;font-size:84px;aspect-ratio:16/10;background:var(--c)}
+.thumb{overflow:hidden}.thumb svg{width:100%;height:100%;display:block}.bob{animation:bob 3s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-5px)}}
+.body{padding:16px 20px 20px;display:flex;flex-direction:column;gap:8px;flex:1}
+.no{font-size:14px;font-weight:700;color:var(--c)}
+.body h2{margin:0;font-size:25px;line-height:1.15}
+.body p{margin:0;font-size:17px;flex:1}
+.buy{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:10px}
+.price{font-size:24px;font-weight:700}
+.btn{font:inherit;font-weight:700;font-size:19px;padding:12px 22px;cursor:pointer;border:0}
+footer{text-align:center;margin-top:44px;font-size:15px}
+
+/* 4: CUENTO */
+body[data-d="4"]{background:radial-gradient(circle at 15% 8%,#ffd6f0,transparent 40%),radial-gradient(circle at 85% 18%,#c9d4ff,transparent 42%),#fdf3ff fixed;color:#4a2c6b;font-family:"Baloo 2","Fredoka",system-ui,sans-serif}
+[data-d="4"] h1{color:#7b3fd0;font-weight:800;text-shadow:0 3px 0 #fff,0 7px 0 #e3c8ff}
+[data-d="4"] .card{background:#fffaf0;border:3px solid #e8c36a;border-radius:28px;overflow:hidden;box-shadow:0 8px 0 #e8c36a}
+[data-d="4"] .card:hover{transform:translateY(-6px) rotate(1deg)}
+[data-d="4"] .thumb{margin:10px 10px 0;border-radius:20px;border:3px solid #e8c36a}
+[data-d="4"] .no{color:#c4881c}
+[data-d="4"] .btn{background:linear-gradient(#ffd45e,#ffb11f);color:#5a3500;border-radius:16px;box-shadow:0 4px 0 #c4881c}
+</style>
+</head>
+<body data-d="4">
+<div class="wrap">
+ <header>
+  <div class="fl"><span>🎮</span><span>⭐</span><span>🎈</span></div>
+  <h1>Ivan Iartsev</h1>
+  <p>¡Elige tu aventura! 5 juegos de historias para niños de 5 a 8 años</p>
+ </header>
+ <main class="grid" id="grid"></main>
+ <footer>© Ivan Iartsev · Hecho con Python 🐍</footer>
+</div>
+<div class="tv" id="tv"><button class="x" onclick="stopT()" aria-label="Cerrar">✕</button><div class="stage"><div class="bg"></div><div class="cap"></div><div class="ttl"></div><div class="pr"></div><button class="rp" onclick="trailer(cur)">↻ Repetir</button></div></div>
+<script>
+const games=[
+ {e:"🌲",c:"#2fb86a",t:"El Bosque Fantástico",d:"Entra en un bosque mágico y ayuda a sus amigos los animales.",p:"12 €"},
+ {e:"🚢",c:"#2f8bff",t:"Barco en el Océano",d:"Estás en medio del mar. ¡Encuentra el camino a casa!",p:"12 €"},
+ {e:"🚂",c:"#ff6a3d",t:"El Tren Misterioso",d:"Sube al tren y descubre qué sorpresa hay en cada vagón.",p:"12 €"},
+ {e:"🐉",c:"#9b5dff",t:"El Dragón",d:"Un dragón enorme vigila la montaña. ¿Serás más listo que él?",p:"15 €"},
+ {e:"⚔️",c:"#f2a600",t:"Eres un Guerrero",d:"¡Tú eres el héroe! Elige tus armas y salva el reino.",p:"15 €"}
+];
+const H='<svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice">',S='</svg>';
+const art=[
+H+`<defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6a5cff"/><stop offset="1" stop-color="#8ff0b8"/></linearGradient><g id="ft"><rect x="-4" y="38" width="8" height="22" fill="#7a4a28"/><path d="M0-24L22 12H-22ZM0-6L28 40H-28Z" fill="#1f9a5f"/></g></defs><rect width="320" height="200" fill="url(#g1)"/><circle cx="256" cy="42" r="20" fill="#fff6b8"/><path d="M0 130Q90 90 170 125T320 115V200H0Z" fill="#3cb878"/><use href="#ft" x="46" y="98"/><use href="#ft" x="270" y="92"/><path d="M0 160Q100 135 200 158T320 150V200H0Z" fill="#2a9a63"/><use href="#ft" transform="translate(196 104) scale(1.3)"/><use href="#ft" transform="translate(110 112) scale(.8)"/><rect x="62" y="170" width="8" height="14" fill="#fff2dc"/><path d="M52 172a14 12 0 0 1 28 0z" fill="#ff4d6d"/><circle cx="60" cy="166" r="2.5" fill="#fff"/><circle cx="70" cy="164" r="2.5" fill="#fff"/><g class="bob" fill="#fff59a"><circle cx="90" cy="70" r="3"/><circle cx="140" cy="55" r="2.5"/><circle cx="228" cy="78" r="3"/></g>`+S,
+H+`<defs><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7b6cff"/><stop offset="1" stop-color="#ffb88c"/></linearGradient></defs><rect width="320" height="200" fill="url(#g2)"/><circle cx="160" cy="125" r="36" fill="#ffe27a"/><path d="M40 40q8-8 16 0q8-8 16 0M240 30q6-6 12 0q6-6 12 0" stroke="#fff" stroke-width="2" fill="none"/><rect y="125" width="320" height="75" fill="#2a7de1"/><g class="bob"><path d="M108 132h104l-14 24H122z" fill="#8a4b2a"/><rect x="158" y="68" width="4" height="66" fill="#5a3320"/><path d="M162 72v52h40z" fill="#fff"/><path d="M158 80v44h-34z" fill="#ffe9d6"/><path d="M162 68l18 6-18 6z" fill="#ff4d4d"/></g><path d="M0 152q20-10 40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0V200H0z" fill="#1b5fc0"/><path d="M0 176q20-10 40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0V200H0z" fill="#174fa6"/>`+S,
+H+`<defs><linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6ec6ff"/><stop offset="1" stop-color="#e3f6ff"/></linearGradient></defs><rect width="320" height="200" fill="url(#g3)"/><circle cx="50" cy="45" r="20" fill="#fff3a0"/><path d="M0 140Q80 90 170 135T320 120V200H0Z" fill="#6fd07a"/><rect y="152" width="320" height="48" fill="#4aa85a"/><rect y="168" width="320" height="5" fill="#6b4a3a"/><rect x="20" y="108" width="105" height="58" rx="6" fill="#3b82f6"/><g fill="#ffe27a"><rect x="32" y="120" width="22" height="20" rx="3"/><rect x="64" y="120" width="22" height="20" rx="3"/><rect x="96" y="120" width="22" height="20" rx="3"/></g><rect x="125" y="150" width="15" height="4" fill="#333"/><rect x="136" y="96" width="52" height="8" fill="#333"/><rect x="140" y="102" width="44" height="64" fill="#d6341d"/><rect x="148" y="112" width="26" height="22" rx="3" fill="#bfe6ff"/><rect x="184" y="122" width="82" height="44" rx="8" fill="#ff5a3d"/><rect x="236" y="98" width="16" height="26" fill="#333"/><circle cx="266" cy="140" r="5" fill="#ffe27a"/><g fill="#2b2b3a"><circle cx="50" cy="170" r="12"/><circle cx="100" cy="170" r="12"/><circle cx="160" cy="171" r="13"/><circle cx="208" cy="171" r="11"/><circle cx="248" cy="171" r="11"/></g><g class="bob" fill="#fff" opacity=".9"><circle cx="244" cy="86" r="8"/><circle cx="258" cy="70" r="11"/><circle cx="280" cy="52" r="14"/></g>`+S,
+H+`<defs><linearGradient id="g4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b1055"/><stop offset="1" stop-color="#8a3ffc"/></linearGradient></defs><rect width="320" height="200" fill="url(#g4)"/><g fill="#fff"><circle cx="30" cy="30" r="2"/><circle cx="90" cy="20" r="1.5"/><circle cx="250" cy="25" r="2"/><circle cx="290" cy="70" r="1.5"/><circle cx="60" cy="80" r="1.5"/></g><circle cx="270" cy="34" r="16" fill="#fff6b8"/><path d="M0 200V150L50 110L100 160L150 120L210 165L270 115L320 150V200Z" fill="#1a0b3a"/><g class="bob"><path d="M120 115Q80 50 58 76Q80 86 76 100Q96 100 120 126Z" fill="#2ba35e"/><path d="M200 115Q240 50 262 76Q240 86 244 100Q224 100 200 126Z" fill="#2ba35e"/></g><path d="M210 152Q262 162 264 128" stroke="#3fcf7a" stroke-width="12" fill="none" stroke-linecap="round"/><ellipse cx="135" cy="172" rx="16" ry="8" fill="#2ba35e"/><ellipse cx="185" cy="172" rx="16" ry="8" fill="#2ba35e"/><ellipse cx="160" cy="132" rx="55" ry="42" fill="#3fcf7a"/><ellipse cx="160" cy="142" rx="34" ry="30" fill="#c9f7a8"/><path d="M138 56l-8-24 18 14zM182 56l8-24-18 14z" fill="#ffe27a"/><circle cx="160" cy="82" r="34" fill="#3fcf7a"/><circle cx="147" cy="78" r="9" fill="#fff"/><circle cx="173" cy="78" r="9" fill="#fff"/><circle cx="149" cy="80" r="4.5" fill="#222"/><circle cx="171" cy="80" r="4.5" fill="#222"/><ellipse cx="160" cy="96" rx="16" ry="10" fill="#7be3a0"/><path d="M152 100q8 6 16 0" stroke="#1d6b40" stroke-width="2" fill="none"/><g class="bob"><path d="M196 94Q230 82 252 98Q230 102 252 114Q222 114 196 102Z" fill="#ff8a1f"/><path d="M198 97Q222 90 238 100Q222 104 198 102Z" fill="#ffd93b"/></g>`+S,
+H+`<defs><linearGradient id="g5" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff8a5c"/><stop offset="1" stop-color="#ffe3a3"/></linearGradient></defs><rect width="320" height="200" fill="url(#g5)"/><circle cx="60" cy="110" r="34" fill="#fff3b0"/><rect x="200" y="62" width="22" height="90" fill="#7a5a9e"/><rect x="268" y="62" width="22" height="90" fill="#7a5a9e"/><rect x="214" y="88" width="62" height="64" fill="#8a69b0"/><path d="M196 62l15-26 15 26zM264 62l15-26 15 26z" fill="#ff4d6d"/><path d="M235 152v-22a10 10 0 0 1 20 0v22z" fill="#4a3166"/><path d="M0 200V164Q100 124 200 160T320 152V200Z" fill="#4fa85a"/><rect x="100" y="140" width="10" height="26" fill="#3a3a6a"/><rect x="118" y="140" width="10" height="26" fill="#3a3a6a"/><rect x="96" y="96" width="40" height="48" rx="10" fill="#3b82f6"/><path d="M134 106L156 82" stroke="#ffd2a6" stroke-width="8" stroke-linecap="round"/><g transform="rotate(35 156 84)"><rect x="153" y="26" width="6" height="58" fill="#e8eefc"/><rect x="146" y="82" width="20" height="5" fill="#ffc247"/></g><circle cx="116" cy="82" r="16" fill="#ffd2a6"/><path d="M99 82a17 17 0 0 1 34 0z" fill="#cfd6e4"/><path d="M116 64q16-16 24 0q-12-4-24 4z" fill="#ff4d6d"/><circle cx="110" cy="86" r="2" fill="#222"/><circle cx="122" cy="86" r="2" fill="#222"/><path d="M68 106h30v22q-15 16-30 0z" fill="#ff5a3d" stroke="#fff" stroke-width="2"/>`+S
+];
+document.getElementById("grid").innerHTML=games.map((g,i)=>`
+ <article class="card" style="--c:${g.c}">
+  <div class="thumb">${art[i]}</div>
+  <div class="body"><div class="no">JUEGO ${i+1}</div><h2>${g.t}</h2><p>${g.d}</p>
+   <div class="buy"><span class="price">${g.p}</span><button class="btn" onclick="trailer(${i})">▶ Tráiler</button></div>
+  </div></article>`).join("");
+const caps=[
+ ["En lo profundo del bosque…","algo mágico se despierta.","¿Ayudarás a los animales?"],
+ ["Sin tierra a la vista…","solo el mar y tu barco.","¿Encontrarás el camino a casa?"],
+ ["Todos a bordo…","el tren sale esta noche.","¿Qué misterio hay en el último vagón?"],
+ ["Una montaña. Una cueva.","Y un dragón gigante.","¿Serás más listo que él?"],
+ ["El reino te necesita…","toma tu espada y tu escudo.","¡Tú eres el guerrero!"]
+];
+const tv=document.getElementById("tv");let tm=[],cur=0;
+function stopT(){tm.forEach(clearTimeout);tm=[];tv.classList.remove("on","end");tv.querySelector(".bg").innerHTML=""}
+function trailer(i){
+ stopT();cur=i;const g=games[i];
+ const bg=tv.querySelector(".bg"),cap=tv.querySelector(".cap"),ttl=tv.querySelector(".ttl"),pr=tv.querySelector(".pr");
+ tv.classList.add("on");bg.innerHTML=art[i];pr.style.background=g.c;
+ cap.className="cap";ttl.className="ttl";pr.classList.remove("run");void pr.offsetWidth;pr.classList.add("run");
+ ttl.innerHTML=`<small>JUEGO ${i+1}</small>${g.t}<em>Muy pronto · ${g.p}</em>`;
+ caps[i].forEach((t,k)=>{
+  tm.push(setTimeout(()=>{cap.textContent=t;cap.className="cap on"},600+k*3000));
+  tm.push(setTimeout(()=>{cap.className="cap"},3200+k*3000));
+ });
+ tm.push(setTimeout(()=>{tv.classList.add("end");ttl.className="ttl on"},9800));
+}
+tv.onclick=e=>{if(e.target===tv)stopT()};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")stopT()});
+</script>
+</body>
+</html>
